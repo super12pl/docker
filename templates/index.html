@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        table {
+            font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 30%;
+        }
+
+        td,
+        th {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;
+        }
+
+        tr:nth-child(even) {
+            background-color: #dddddd;
+        }
+    </style>
+</head>
+
+<body>
+    <table>
+        <h2>Przychody</h2>
+        <tr>
+            <th>Lp.</th>
+            <th>Klient</th>
+            <th>Produkt</th>
+            <th>Kwota</th>
+            <th></th>
+        </tr>
+        {% for x in result %}
+        <tr>
+            <form action="/remove" method="post">
+                <input type="hidden" name="id" value="{{x[0]}}">
+                {% for y in x %}
+                <td>{{y}}</td>
+                {% endfor %}
+                <td><button type="submit">🗑️</button></td>
+            </form>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>#</td>
+            <form action="/add" method="post">
+                <td><input name="name" type="text"></td>
+                <td><input name="item" type="text"></td>
+                <td><input name="pay" type="number"></td>
+                <td><button type="submit">➕</button></td>
+            </form>
+
+        </tr>
+    </table>
+    <table>
+        <h2>Wydatki</h2>
+        <tr>
+            <th>Lp.</th>
+            <th>Pracownik</th>
+            <th>Wydatek</th>
+            <th>Kwota</th>
+            <th></th>
+        </tr>
+        {% for x in result2 %}
+        <tr>
+            <form action="/remove2" method="post">
+                <input type="hidden" name="id" value="{{x[0]}}">
+                {% for y in x %}
+                <td>{{y}}</td>
+                {% endfor %}
+                <td><button type="submit">🗑️</button></td>
+            </form>
+        </tr>
+        {% endfor %}
+        <tr>
+            <td>#</td>
+            <form action="/add2" method="post">
+                <td><input name="name" type="text"></td>
+                <td><input name="item" type="text"></td>
+                <td><input name="pay" type="number"></td>
+                <td><button type="submit">➕</button></td>
+            </form>
+
+        </tr>
+    </table>
+
+</body>
+
+</html>

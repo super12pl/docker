@@ -1,0 +1,90 @@
+version: '3'
+
+services:
+  server:
+    build:
+      context: .
+    ports:
+      - 5000:5000
+    stop_signal: SIGINT
+    depends_on:
+      - rabbitmq
+      - mysql
+    restart: on-failure
+    environment:
+      MYSQL_HOST: mysql
+      MYSQL_USER: root
+      MYSQL_PASSWORD: secret
+      MYSQL_DB: sprzedaz
+    links:
+      - rabbitmq
+    networks:
+      - default
+
+  listener:
+    build:
+      context: ./listener
+    ports:
+      - 5001:5001
+    stop_signal: SIGINT
+    restart: on-failure
+    links:
+      - rabbitmq
+    depends_on:
+      - rabbitmq
+      - postgres
+    networks:
+      - default
+
+  mysql:
+    image: mysql:latest
+    restart: always
+    volumes:
+      - pytongmysql:/var/lib/mysql
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: secret
+      MYSQL_DATABASE: sprzedaz
+
+  postgres:
+    image: postgres
+    ports:
+      - 5432:5432
+    volumes:
+      - pytongpsql:/var/lib/postgresql
+    networks:
+      - default
+    depends_on:
+      - rabbitmq
+    links:
+      - rabbitmq
+    restart: on-failure
+    environment:
+      - POSTGRES_DATABASE=zakup
+      - POSTGRES_USER=user
+      - POSTGRES_PASSWORD=secret
+
+  rabbitmq:
+    image: rabbitmq:3.12-management
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_PLUGINS_DIR=/opt/rabbitmq/plugins:/usr/lib/rabbitmq/plugins
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - default
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:15672" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  pytongmysql:
+  pytongpsql:
+networks:
+  default:
+    driver: bridge
